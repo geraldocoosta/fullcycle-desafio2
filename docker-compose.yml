@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+    networks:
+      - desafio2net
+
+  server:
+    container_name: server
+    build:
+      context: ./node
+    entrypoint: dockerize --wait tcp://db:3306 -timeout 50s node index.js
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - desafio2net
+
+  db:
+    image: mysql:5.7
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - db_volume_desafio2:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - desafio2net
+
+volumes:
+  db_volume_desafio2:
+
+networks:
+  desafio2net:
+    driver: bridge
