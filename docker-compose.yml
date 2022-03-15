@@ -12,8 +12,8 @@ services:
     networks:
       - desafio2net
 
-  server:
-    container_name: server
+  app:
+    container_name: app
     build:
       context: ./node
     entrypoint: dockerize --wait tcp://db:3306 -timeout 50s node index.js
